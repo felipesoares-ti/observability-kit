@@ -1,0 +1,8 @@
+resources:
+  - ../../base/k8s/namespace-monitoring.yaml
+  - ../../base/k8s/deployments/app-deployment.yaml
+  - ../../base/k8s/deployments/otel-collector-deployment.yaml
+  - ../../base/k8s/services/app-service.yaml
+  - ../../base/k8s/services/otel-collector-service.yaml
+  - ../../base/otel/otel-collector-config.yaml
+  - ../../base/dashboards/http-metrics.json

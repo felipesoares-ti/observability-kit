@@ -1,0 +1,16 @@
+# Service da aplicação observability-app
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: observability-app
+  labels:
+    app: observability-app
+spec:
+  selector:
+    app: observability-app
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

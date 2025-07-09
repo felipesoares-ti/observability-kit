@@ -1,0 +1,16 @@
+# values.yaml unificado para todos os charts
+
+# Grafana
+adminPassword: prom-operator
+
+# Loki
+loki:
+  enabled: true
+
+# Prometheus
+prometheus:
+  enabled: true
+
+# Tracing Backend
+tracing-backend:
+  enabled: true

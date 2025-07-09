@@ -1,0 +1,43 @@
+# Deployment do OpenTelemetry Collector
+# Use overlays para customizar imagem, recursos, etc.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: monitoring
+  labels:
+    app: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector:0.75.0
+        command: ["/otelcontribcol"]
+        args: ["--config", "/conf/otel-collector-config.yaml"]
+        ports:
+        - containerPort: 4318
+        - containerPort: 8889
+        volumeMounts:
+        - name: config-volume
+          mountPath: /conf
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: config-volume
+        hostPath:
+          path: /mnt/data/observability-kit/otel
+          type: Directory

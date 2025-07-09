@@ -1,0 +1,56 @@
+# Deployment da aplicação observability-app
+# Use overlays para customizar imagem, recursos, etc.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observability-app
+  labels:
+    app: observability-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: observability-app
+  template:
+    metadata:
+      labels:
+        app: observability-app
+    spec:
+      containers:
+      - name: observability-app
+        image: python:3.10-slim
+        command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+        workingDir: /app
+        env:
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-collector.monitoring.svc.cluster.local:4318/v1/traces"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: app-code
+        hostPath:
+          path: /mnt/data/observability-kit/app
+          type: Directory
