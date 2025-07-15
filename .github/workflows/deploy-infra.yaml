@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'infrastructure/**'
-      - '.github/workflows/deploy-infra.yaml'
+      - '.github/workflows/deploy-infra.yml'
   workflow_dispatch:
 
 jobs:
@@ -13,27 +13,30 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
+
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v4
         with:
           version: 'latest'
+
       - name: Instalar Helm
         uses: azure/setup-helm@v4
         with:
           version: 'latest'
+
       - name: Configurar credenciais do cluster
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
+
       - name: Aplicar manifests base
-        run: |
-          kubectl apply -k infrastructure/base/
+        run: kubectl apply -k infrastructure/base/
+
       - name: Aplicar overlay dev
         if: github.ref == 'refs/heads/dev'
-        run: |
-          kubectl apply -k infrastructure/overlays/dev/
+        run: kubectl apply -k infrastructure/overlays/dev/
+
       - name: Aplicar overlay prod
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/prod'
-        run: |
-          kubectl apply -k infrastructure/overlays/prod/
+        run: kubectl apply -k infrastructure/overlays/prod/
